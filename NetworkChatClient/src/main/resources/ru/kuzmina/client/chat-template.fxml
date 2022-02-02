@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="393.0" prefWidth="576.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.kuzmina.client.controllers.ClientController">
+   <bottom>
+       <HBox alignment="BASELINE_CENTER" prefHeight="25.0" BorderPane.alignment="CENTER">
+          <children>
+              <Label prefHeight="34.0" prefWidth="78.0" text="Сообщение:" textOverrun="CLIP" HBox.hgrow="NEVER" />
+              <TextField fx:id="messageField" maxWidth="1.7976931348623157E308" onAction="#sendMessage" prefHeight="27.0" prefWidth="333.0" HBox.hgrow="ALWAYS" />
+              <Button fx:id="sendButton" mnemonicParsing="false" onAction="#sendMessage" prefHeight="27.0" prefWidth="90.0" text="Отправить" HBox.hgrow="NEVER" />
+          </children>
+         <padding>
+            <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+         </padding>
+       </HBox>
+   </bottom>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+            <Menu mnemonicParsing="false" text="Сетевой Чат">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#onClose" text="Закрыть" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Настройки" />
+          <Menu mnemonicParsing="false" text="Помощь">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <center>
+      <SplitPane dividerPositions="0.2682926829268293">
+         <items>
+            <ListView fx:id="userList" prefHeight="335.0" prefWidth="156.0" />
+            <TextArea fx:id="chatArea" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
+         </items>
+      </SplitPane>
+   </center>
+</BorderPane>
