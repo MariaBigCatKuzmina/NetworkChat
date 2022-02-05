@@ -35,7 +35,6 @@ public class AuthController {
             Dialogs.AuthErrors.EMPTY_CREDENTIALS.show();
             return;
         }
-
         if (!hasConnectedToServer()) {
             Dialogs.NetworkError.SERVER_CONNECT.show();
         }

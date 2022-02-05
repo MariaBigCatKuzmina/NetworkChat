@@ -3,6 +3,7 @@ package ru.kuzmina.server.chat;
 import ru.kuzmina.clientserver.Command;
 import ru.kuzmina.clientserver.CommandType;
 import ru.kuzmina.clientserver.commands.AuthCommandData;
+import ru.kuzmina.clientserver.commands.ChangeUserNameCommandData;
 import ru.kuzmina.clientserver.commands.PrivateMessageCommandData;
 import ru.kuzmina.clientserver.commands.PublicMessageCommandData;
 
@@ -49,21 +50,8 @@ public class ClientHandler {
     }
 
     private void authenticate() throws IOException {
-        Timer closeConnectionTimer = new Timer();
-        TimerTask closeConnectionTask = new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    System.out.println("Connection closed on timeout");
-                    sendCommand(Command.errorCommand("Соединение с сервером прервано по таймауту./nПерезапустите приложение и попробуйте еще раз "));
-                    closeConnection();
-                } catch (IOException e) {
-                    System.err.println("Failed to close connection");
-                    e.printStackTrace();
-                }
-            }
-        };
-        closeConnectionTimer.schedule(closeConnectionTask, 120000);
+        Timer closeConnectionTimer = getCloseConnectionTimer();
+
         while (true) {
             Command command = readCommand();
             if (command == null) {
@@ -88,6 +76,25 @@ public class ClientHandler {
                 }
             }
         }
+    }
+
+    private Timer getCloseConnectionTimer() {
+        Timer closeConnectionTimer = new Timer();
+        TimerTask closeConnectionTask = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println("Connection closed on timeout");
+                    sendCommand(Command.errorCommand("Соединение с сервером прервано по таймауту./nПерезапустите приложение и попробуйте еще раз "));
+                    closeConnection();
+                } catch (IOException e) {
+                    System.err.println("Failed to close connection");
+                    e.printStackTrace();
+                }
+            }
+        };
+        closeConnectionTimer.schedule(closeConnectionTask, 120000);
+        return closeConnectionTimer;
     }
 
     public void sendCommand(Command command) throws IOException {
@@ -126,10 +133,20 @@ public class ClientHandler {
                     server.broadcastMessage(publicCommand.getMessage(), this);
                     break;
                 }
+                case CHANGE_USERNAME: {
+                    ChangeUserNameCommandData commandData = (ChangeUserNameCommandData) command.getData();
+                    if (server.getAuthService().updateUserName(commandData.getOldUserName(), commandData.getNewUserName(),commandData.getPassword()) > 0) {
+                        userName = commandData.getNewUserName();
+                        server.notifyClientUserListUpdated();
+                        sendCommand(Command.authOkCommand(userName));
+                    } else {
+                        sendCommand(Command.errorCommand("Неверный пароль"));
+                    }
+                    break;
+                }
             }
         }
     }
-
 
     private void closeConnection() throws IOException {
         server.unsubscribe(this);

@@ -52,11 +52,9 @@ public class MyServer {
         }
     }
 
-    public synchronized boolean isClientConnected (String userName)
-    {
+    public synchronized boolean isClientConnected (String userName) {
         for (ClientHandler clientItm : this.clients) {
             if (clientItm.getUserName().equals(userName)) {
-
                 return true;
             }
         }
@@ -77,7 +75,7 @@ public class MyServer {
         return authService;
     }
 
-    private void notifyClientUserListUpdated() throws IOException {
+    public void notifyClientUserListUpdated() throws IOException {
         List<String> connectedUsers = new ArrayList<>();
         for (ClientHandler client : clients) {
             connectedUsers.add(client.getUserName());
