@@ -8,6 +8,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ru.kuzmina.client.controllers.AuthController;
 import ru.kuzmina.client.controllers.ClientController;
+import ru.kuzmina.client.history.HistoryHandler;
 
 import java.io.IOException;
 
@@ -22,6 +23,8 @@ public class ClientChat extends Application {
     private Stage changeNameStage;
 
     private static String userName;
+
+    private HistoryHandler historyHandler;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -84,6 +87,14 @@ public class ClientChat extends Application {
         getChatController().initializeMessageHandler();
         getAuthController().close();
         getAuthStage().close();
+        try {
+            historyHandler = new HistoryHandler(userName);
+            getChatController().loadChatHistory();
+        } catch (IOException e) {
+            System.err.println("Failed to open history file ");
+            e.printStackTrace();
+        }
+
     }
 
     public Stage getAuthStage() {
@@ -102,9 +113,17 @@ public class ClientChat extends Application {
         return userName;
     }
 
+    public HistoryHandler getHistoryHandler() {
+        return historyHandler;
+    }
+
     public static void main(String[] args) {
         Application.launch();
     }
 
-
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        historyHandler.close();
+    }
 }
