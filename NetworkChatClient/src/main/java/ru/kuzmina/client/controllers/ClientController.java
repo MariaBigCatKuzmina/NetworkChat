@@ -26,6 +26,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 public class ClientController {
     @FXML
@@ -88,7 +89,7 @@ public class ClientController {
     }
 
     public void loadChatHistory() throws IOException {
-        ArrayList<String> lastHistory = new ArrayList<> (ClientChat.INSTANCE.getHistoryHandler().readLastHundredEntries());
+        List<String> lastHistory = new ArrayList<> (ClientChat.INSTANCE.getHistoryHandler().readLastNEntries(100));
         if (lastHistory != null) {
             Iterator<String> itr = lastHistory.iterator();
             while (itr.hasNext()) {

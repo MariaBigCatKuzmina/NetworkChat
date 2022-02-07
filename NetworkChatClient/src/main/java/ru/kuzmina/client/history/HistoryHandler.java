@@ -1,6 +1,7 @@
 package ru.kuzmina.client.history;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,16 +14,16 @@ public class HistoryHandler {
         fileWriter.flush();
     }
 
-    public List<String> readLastHundredEntries() throws IOException {
+    public List<String> readLastNEntries(int entriesNumber) throws IOException {
         String l;
         List<String> fileLines = new ArrayList<>();
-        try (BufferedReader fileReader = new BufferedReader(new FileReader(historyDirectory))) {
+        try (BufferedReader fileReader = new BufferedReader(new FileReader(historyDirectory, StandardCharsets.UTF_8))) {
             while ((l = fileReader.readLine()) != null) {
                 fileLines.add(l);
             }
             if (!fileLines.isEmpty()) {
                 int arrayListLength = fileLines.size() - 1;
-                int firstElement = (arrayListLength <= 100) ? 0 : arrayListLength - 100;
+                int firstElement = (arrayListLength <= entriesNumber) ? 0 : arrayListLength - entriesNumber;
                 return  fileLines.subList(firstElement, arrayListLength);
             }
             return null;
