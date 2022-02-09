@@ -90,14 +90,11 @@ public class ClientController {
 
     public void loadChatHistory() throws IOException {
         List<String> lastHistory = new ArrayList<> (ClientChat.INSTANCE.getHistoryHandler().readLastNEntries(100));
-        if (lastHistory != null) {
-            Iterator<String> itr = lastHistory.iterator();
-            while (itr.hasNext()) {
-                chatArea.appendText(itr.next());
-                chatArea.appendText(System.lineSeparator());
-            }
+        for (String s : lastHistory) {
+            chatArea.appendText(s);
             chatArea.appendText(System.lineSeparator());
         }
+        chatArea.appendText(System.lineSeparator());
     }
 
     public void onClose() {
