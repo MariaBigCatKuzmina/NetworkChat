@@ -11,17 +11,12 @@ import ru.kuzmina.client.dialogs.Dialogs;
 import ru.kuzmina.client.model.Network;
 import ru.kuzmina.client.model.ReadCommandListener;
 import ru.kuzmina.clientserver.Command;
-import ru.kuzmina.clientserver.CommandType;
 import ru.kuzmina.clientserver.commands.AuthOkCommandData;
 import ru.kuzmina.clientserver.commands.ErrorCommandData;
 
 import java.io.IOException;
 
 public class AuthController {
-
-    public static final String AUTH_COMMAND = "/auth";
-    public static final String AUTH_OK_COMMAND = "/authOk";
-    public static final String AUTH_DUPLICATE_COMMAND = "/authDuplicate";
 
     @FXML
     private TextField loginField;
@@ -40,7 +35,6 @@ public class AuthController {
             Dialogs.AuthErrors.EMPTY_CREDENTIALS.show();
             return;
         }
-
         if (!hasConnectedToServer()) {
             Dialogs.NetworkError.SERVER_CONNECT.show();
         }

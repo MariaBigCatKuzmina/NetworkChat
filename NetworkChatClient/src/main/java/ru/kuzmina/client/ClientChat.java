@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ru.kuzmina.client.controllers.AuthController;
@@ -12,14 +11,17 @@ import ru.kuzmina.client.controllers.ClientController;
 
 import java.io.IOException;
 
-
 public class ClientChat extends Application {
     public static ClientChat INSTANCE;
 
     private FXMLLoader chatWindowLoader;
     private FXMLLoader authDialogLoader;
+    private FXMLLoader changeNameLoader;
     private Stage primaryStage;
     private Stage authStage;
+    private Stage changeNameStage;
+
+    private static String userName;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -32,13 +34,14 @@ public class ClientChat extends Application {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init() {
         INSTANCE = this;
     }
 
     public void initViews() throws IOException {
         initChatWindow();
         initAuthDialog();
+        initChangeNameDialog();
     }
 
     private void initAuthDialog() throws IOException {
@@ -59,6 +62,14 @@ public class ClientChat extends Application {
 
     }
 
+    private void initChangeNameDialog() throws IOException {
+        changeNameLoader = new FXMLLoader(getClass().getResource("changeUserName-template.fxml"));
+        Parent changeNameDialog = changeNameLoader.load();
+        changeNameStage = new Stage();
+        changeNameStage.initOwner(primaryStage);
+        changeNameStage.initModality(Modality.WINDOW_MODAL);
+        changeNameStage.setScene(new Scene(changeNameDialog));
+    }
     private AuthController getAuthController(){
         return authDialogLoader.getController();
     }
@@ -67,31 +78,32 @@ public class ClientChat extends Application {
         return chatWindowLoader.getController();
     }
 
-
     public void switchToMainChatWindow(String userName) {
+        this.userName = userName;
         getChatStage().setTitle(userName);
         getChatController().initializeMessageHandler();
         getAuthController().close();
         getAuthStage().close();
     }
 
-    public void showErrorDialog(String errorMessage) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Ошибка");
-        alert.setContentText(errorMessage);
-        alert.showAndWait();
-    }
-
     public Stage getAuthStage() {
         return authStage;
     }
 
-    public static void main(String[] args) {
-        Application.launch();
-    }
-
     public Stage getChatStage() {
         return this.primaryStage;
+    }
+
+    public Stage getChangeNameStage() {
+        return changeNameStage;
+    }
+
+    public static String getUserName() {
+        return userName;
+    }
+
+    public static void main(String[] args) {
+        Application.launch();
     }
 
 

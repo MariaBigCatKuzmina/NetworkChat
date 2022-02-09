@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -22,6 +23,7 @@
         <menus>
             <Menu mnemonicParsing="false" text="Сетевой Чат">
                <items>
+                  <MenuItem mnemonicParsing="false" onAction="#changeUserName" text="Изменить имя пользователя" />
                   <MenuItem mnemonicParsing="false" onAction="#onClose" text="Закрыть" />
                </items>
             </Menu>

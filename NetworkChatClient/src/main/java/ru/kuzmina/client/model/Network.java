@@ -66,7 +66,6 @@ public class Network {
             System.err.println("Не удалось отправить сообщение");
             throw e;
         }
-
     }
 
     public void sendPrivateMessage(String recipient, String message) throws IOException {
@@ -75,6 +74,10 @@ public class Network {
 
     public void sendAuthMessage(String login, String password) throws IOException {
         sendCommand(Command.authCommand(login, password));
+    }
+
+    public void sendChangeUserNameMessage(String oldName, String newName, String password) throws IOException {
+        sendCommand(Command.changeUserNameCommand(oldName, newName, password));
     }
 
     public Thread startReadMessageProcess() {
