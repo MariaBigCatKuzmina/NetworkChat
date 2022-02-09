@@ -43,6 +43,22 @@ public class Dialogs {
 
     }
 
+    public enum HistoryFileError {
+        OPEN_FILE("Ошибка доступа к файлу"),
+        WRITE_FILE("Ошибка записи в файл");
+
+        private static final String TITLE = "Ошибка работы с файлом";
+        private static final String TYPE = "Ошибка работы с файлом истории";
+        private final String message;
+
+        HistoryFileError(String message) {
+            this.message = message;
+        }
+
+        public void show() {
+            showDialog(Alert.AlertType.ERROR, TITLE, TYPE, message);
+        }
+    }
     private static  void showDialog(Alert.AlertType dialogType, String title, String type, String message){
         Alert alert = new Alert(dialogType);
         alert.initOwner(ClientChat.INSTANCE.getChatStage());

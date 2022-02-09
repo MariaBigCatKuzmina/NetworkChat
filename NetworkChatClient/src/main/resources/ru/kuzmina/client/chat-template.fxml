@@ -40,7 +40,7 @@
       <SplitPane dividerPositions="0.2682926829268293">
          <items>
             <ListView fx:id="userList" prefHeight="335.0" prefWidth="156.0" />
-            <TextArea fx:id="chatArea" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
+            <TextArea fx:id="chatArea" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
          </items>
       </SplitPane>
    </center>
