@@ -8,6 +8,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ru.kuzmina.client.controllers.AuthController;
 import ru.kuzmina.client.controllers.ClientController;
+import ru.kuzmina.client.history.HistoryHandler;
+import ru.kuzmina.client.model.Network;
 
 import java.io.IOException;
 
@@ -16,12 +18,13 @@ public class ClientChat extends Application {
 
     private FXMLLoader chatWindowLoader;
     private FXMLLoader authDialogLoader;
-    private FXMLLoader changeNameLoader;
     private Stage primaryStage;
     private Stage authStage;
     private Stage changeNameStage;
 
     private static String userName;
+
+    private HistoryHandler historyHandler;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -59,11 +62,10 @@ public class ClientChat extends Application {
         chatWindowLoader.setLocation(getClass().getResource("chat-template.fxml"));
         Parent root = chatWindowLoader.load();
         this.primaryStage.setScene(new Scene(root));
-
     }
 
     private void initChangeNameDialog() throws IOException {
-        changeNameLoader = new FXMLLoader(getClass().getResource("changeUserName-template.fxml"));
+        FXMLLoader changeNameLoader = new FXMLLoader(getClass().getResource("changeUserName-template.fxml"));
         Parent changeNameDialog = changeNameLoader.load();
         changeNameStage = new Stage();
         changeNameStage.initOwner(primaryStage);
@@ -84,6 +86,13 @@ public class ClientChat extends Application {
         getChatController().initializeMessageHandler();
         getAuthController().close();
         getAuthStage().close();
+        try {
+            historyHandler = new HistoryHandler(userName);
+            getChatController().loadChatHistory();
+        } catch (IOException e) {
+            System.err.println("Failed to open history file ");
+            e.printStackTrace();
+        }
     }
 
     public Stage getAuthStage() {
@@ -102,9 +111,18 @@ public class ClientChat extends Application {
         return userName;
     }
 
+    public HistoryHandler getHistoryHandler() {
+        return historyHandler;
+    }
+
     public static void main(String[] args) {
         Application.launch();
     }
 
-
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        historyHandler.close();
+        Network.getInstance().close();
+    }
 }

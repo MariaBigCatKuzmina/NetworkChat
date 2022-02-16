@@ -11,6 +11,8 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 //Класс отвечающий за клиентское соединение
 public class ClientHandler {
@@ -21,17 +23,20 @@ public class ClientHandler {
     private ObjectOutputStream outputStream;
     private String userName;
 
+    private ExecutorService executorService;
+
 
     public ClientHandler(MyServer myServer, Socket clientSocket) {
         this.clientSocket = clientSocket;
         this.server = myServer;
+        executorService = Executors.newFixedThreadPool(1);
     }
 
     public void handle() throws IOException {
         inputStream = new ObjectInputStream(clientSocket.getInputStream());
         outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
 
-        new Thread(() -> {
+        executorService.execute(() -> {
             try {
                 authenticate();
                 readMessages();
@@ -46,7 +51,7 @@ public class ClientHandler {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
     }
 
     private void authenticate() throws IOException {
@@ -153,6 +158,7 @@ public class ClientHandler {
         inputStream.close();
         outputStream.close();
         clientSocket.close();
+        executorService.shutdown();
     }
 
     public String getUserName() {

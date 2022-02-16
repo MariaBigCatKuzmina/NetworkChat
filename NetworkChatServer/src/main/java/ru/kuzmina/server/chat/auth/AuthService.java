@@ -3,7 +3,7 @@ package ru.kuzmina.server.chat.auth;
 import java.sql.*;
 
 public class AuthService {
-    public static final String CONNECTION_STRING = "jdbc:sqlite:/Users/mariakuzmina/Documents/GBCourses/Java/NetworkChat/NetworkChatServer/src/main/java/ru/kuzmina/server/userdb/NetworkChatDB.db";
+    public static final String CONNECTION_STRING = "jdbc:sqlite:NetworkChatDB.db";
 
     private Connection connection;
     private Statement statement;

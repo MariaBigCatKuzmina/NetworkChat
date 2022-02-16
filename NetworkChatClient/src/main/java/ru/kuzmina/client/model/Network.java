@@ -6,6 +6,8 @@ import java.io.*;
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Network {
 
@@ -21,8 +23,9 @@ public class Network {
     private ObjectOutputStream outputStream;
 
     private static Network INSTANCE;
-    private Thread readMessageProcess;
     private boolean isConnected;
+
+    private final ExecutorService executorService;
 
     public static Network getInstance() {
         if (INSTANCE == null) {
@@ -34,6 +37,7 @@ public class Network {
     private Network(int port, String host) {
         this.port = port;
         this.host = host;
+        executorService = Executors.newSingleThreadExecutor();
     }
 
     private Network() {
@@ -45,7 +49,8 @@ public class Network {
             this.socket = new Socket(this.host, this.port);
             this.outputStream = new ObjectOutputStream(socket.getOutputStream());
             this.inputStream = new ObjectInputStream(socket.getInputStream());
-            readMessageProcess = startReadMessageProcess();
+            //readMessageProcess =
+            startReadMessageProcess();
             this.isConnected = true;
             return true;
         } catch (IOException e) {
@@ -80,8 +85,8 @@ public class Network {
         sendCommand(Command.changeUserNameCommand(oldName, newName, password));
     }
 
-    public Thread startReadMessageProcess() {
-        Thread thread = new Thread(() -> {
+    public void startReadMessageProcess() {
+         executorService.execute(() -> {
             while (true) {
                 try {
                     if (Thread.currentThread().isInterrupted()) {
@@ -99,9 +104,6 @@ public class Network {
                 }
             }
         });
-        thread.setDaemon(true);
-        thread.start();
-        return thread;
     }
 
     private Command readCommand() throws IOException {
@@ -127,10 +129,10 @@ public class Network {
     public void close() {
         try {
             isConnected = false;
-            readMessageProcess.interrupt();
             inputStream.close();
             outputStream.close();
             socket.close();
+            executorService.shutdown();
         } catch (IOException e) {
             e.printStackTrace();
         }
