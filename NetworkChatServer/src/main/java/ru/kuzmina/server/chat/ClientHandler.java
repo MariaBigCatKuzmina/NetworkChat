@@ -7,6 +7,8 @@ import ru.kuzmina.clientserver.commands.ChangeUserNameCommandData;
 import ru.kuzmina.clientserver.commands.PrivateMessageCommandData;
 import ru.kuzmina.clientserver.commands.PublicMessageCommandData;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.Socket;
 import java.util.Timer;
@@ -23,8 +25,8 @@ public class ClientHandler {
     private ObjectOutputStream outputStream;
     private String userName;
 
-    private ExecutorService executorService;
-
+    private final ExecutorService executorService;
+    private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
 
     public ClientHandler(MyServer myServer, Socket clientSocket) {
         this.clientSocket = clientSocket;
@@ -41,13 +43,13 @@ public class ClientHandler {
                 authenticate();
                 readMessages();
             } catch (IOException e) {
-                System.err.println("Failed to read incoming message from client");
+                LOGGER.error("Failed to read incoming message from client");
                 e.printStackTrace();
             } finally {
                 try {
                     closeConnection();
                 } catch (IOException e) {
-                    System.err.println("Failed to close connection");
+                    LOGGER.error("Failed to close connection");
                     e.printStackTrace();
                 }
             }
@@ -56,7 +58,6 @@ public class ClientHandler {
 
     private void authenticate() throws IOException {
         Timer closeConnectionTimer = getCloseConnectionTimer();
-
         while (true) {
             Command command = readCommand();
             if (command == null) {
@@ -89,11 +90,11 @@ public class ClientHandler {
             @Override
             public void run() {
                 try {
-                    System.out.println("Connection closed on timeout");
+                    LOGGER.warn("Connection closed on timeout");
                     sendCommand(Command.errorCommand("Соединение с сервером прервано по таймауту./nПерезапустите приложение и попробуйте еще раз "));
                     closeConnection();
                 } catch (IOException e) {
-                    System.err.println("Failed to close connection");
+                    LOGGER.error("Failed to close connection");
                     e.printStackTrace();
                 }
             }
@@ -111,7 +112,7 @@ public class ClientHandler {
         try {
             command = (Command) inputStream.readObject();
          } catch (ClassNotFoundException e) {
-            System.err.println("Failed to read a command class");
+            LOGGER.error("Failed to read a command class");
             e.printStackTrace();
         }
         return command;
@@ -131,11 +132,13 @@ public class ClientHandler {
                     String recipientName = privateCommand.getReciever();
                     String message = privateCommand.getMessage();
                     server.sendPrivateMessage(this, recipientName, message);
+                    LOGGER.info("Private message from" + this.getUserName() + " to " + recipientName);
                     break;
                 }
                 case PUBLIC_MESSAGE: {
                     PublicMessageCommandData publicCommand = (PublicMessageCommandData) command.getData();
                     server.broadcastMessage(publicCommand.getMessage(), this);
+                    LOGGER.info("Public message from " + this.getUserName());
                     break;
                 }
                 case CHANGE_USERNAME: {
@@ -144,7 +147,9 @@ public class ClientHandler {
                         userName = commandData.getNewUserName();
                         server.notifyClientUserListUpdated();
                         sendCommand(Command.authOkCommand(userName));
+                        LOGGER.warn("Username was changed");
                     } else {
+                        LOGGER.error("Wrong Login or Password");
                         sendCommand(Command.errorCommand("Неверный пароль"));
                     }
                     break;

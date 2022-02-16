@@ -1,5 +1,7 @@
 package ru.kuzmina.server.chat;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.kuzmina.clientserver.Command;
 import ru.kuzmina.server.chat.auth.AuthService;
 
@@ -13,16 +15,17 @@ public class MyServer {
 
     private final List<ClientHandler> clients = new ArrayList<>();
     private AuthService authService;
+    private static final Logger LOGGER = LogManager.getLogger(MyServer.class);
 
     public void start(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server has been started");
+            LOGGER.info("Server has been started");
             authService = new AuthService();
             while (true) {
                 waitAndProcessClientConnection(serverSocket);
             }
         } catch (IOException e) {
-            System.err.println("Failed to bind port " + port);
+            LOGGER.error("Failed to bind the port " + port);
             e.printStackTrace();
         }
     }
@@ -30,7 +33,7 @@ public class MyServer {
     private void waitAndProcessClientConnection(ServerSocket serverSocket) throws IOException {
         System.out.println("Waiting for new connections");
         Socket clientSocket = serverSocket.accept();
-        System.out.println("Client has been connected");
+        LOGGER.info("Client has been connected");
         ClientHandler clientHandler = new ClientHandler(this, clientSocket);
         clientHandler.handle();
     }
@@ -64,10 +67,12 @@ public class MyServer {
     public synchronized void subscribe(ClientHandler client) throws IOException {
         this.clients.add(client);
         notifyClientUserListUpdated();
+        LOGGER.info("Client " + client.getUserName() + " was subscribed");
     }
 
     public synchronized void unsubscribe(ClientHandler client) throws IOException {
         this.clients.remove(client);
+        LOGGER.info("Client " + client.getUserName() + " was unsubscribed");
         notifyClientUserListUpdated();
     }
 
