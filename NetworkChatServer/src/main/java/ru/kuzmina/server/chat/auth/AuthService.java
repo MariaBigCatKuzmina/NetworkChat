@@ -1,10 +1,13 @@
 package ru.kuzmina.server.chat.auth;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
 
 public class AuthService {
     public static final String CONNECTION_STRING = "jdbc:sqlite:NetworkChatDB.db";
-
+    public static final Logger LOGGER = LogManager.getLogger(AuthService.class);
     private Connection connection;
     private Statement statement;
 
@@ -22,7 +25,7 @@ public class AuthService {
                 connection.close();
             }
         } catch (SQLException e) {
-            System.err.println("Failed to close connection to User database");
+            LOGGER.error("Failed to close connection to User database");
             e.printStackTrace();
         }
     }
@@ -33,7 +36,7 @@ public class AuthService {
             connect();
             userName = getUserNameFromDB(login, password);
         } catch (SQLException e) {
-            System.err.println("Failed to connect to Users database");
+            LOGGER.error("Failed to connect to User database");
             e.printStackTrace();
         } finally {
             disconnect();
@@ -56,7 +59,7 @@ public class AuthService {
             connect();
             return statement.executeUpdate(qslText);
         } catch (SQLException e) {
-            System.err.println("Failed to connect to Users database");
+            LOGGER.error("Failed to connect to User database");
             e.printStackTrace();
         } finally {
             disconnect();
